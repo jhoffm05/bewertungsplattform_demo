@@ -15,7 +15,7 @@ function ensureRevealList(){
   if (!list) {
     const container = document.createElement('div');
     container.id = 'reveal-order-container';
-    // kleines Styling optional
+
     container.style.position = 'fixed';
     container.style.right = '10px';
     container.style.top = '10px';

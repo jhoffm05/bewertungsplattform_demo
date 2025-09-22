@@ -29,12 +29,19 @@ nav {
       border-radius: 13px;
       overflow: hidden;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-size: 0.8em;
+      color: #555;
 }
 
 .blurred {
       filter: blur(3px);
       cursor: pointer;
       transition: filter 0.3s ease;
+}
+
+.card-title {
+      font-size: 1.4em;
+      color: #555; 
 }
 
 .reviewall {
@@ -96,6 +103,7 @@ nav {
       object-fit: cover;
       flex-shrink: 0;
       padding-top: 10px;
+      padding-left: 10px;
 }
 
 .authorinfo {
@@ -109,6 +117,7 @@ nav {
       font-weight: bold;
       margin: 0;
       padding-top: 10px;
+      font-size: 0.8em; 
 }
 
 .authorinformation {
@@ -170,6 +179,7 @@ nav {
 .total-rating-box {
       width: 30%; 
       margin: 0; 
+      margin-left: 80px; 
       padding: 0; 
 }
 
@@ -193,7 +203,7 @@ nav {
 .corporatename {
       color: #555;
       font-weight: bolder;
-      font-size: 0.9em;
+      font-size: 0.7em;
       margin-top: -15px; 
       margin-bottom: 0;
 }
