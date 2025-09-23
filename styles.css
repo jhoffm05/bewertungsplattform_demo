@@ -13,15 +13,15 @@ nav {
 
 .star {
       color: gold;
-      font-size: 0.9em;
-      margin: 0; 
-      padding: 0; 
+      font-size: 1.2em;
+      margin: 0;
+      padding: 0;
 }
 
 .star-rating {
       margin: 0;
       margin-top: -3px;
-      padding: 0; 
+      padding: 0;
       text-align: center;
 }
 
@@ -41,9 +41,12 @@ nav {
 
 .card-title {
       font-size: 1.4em;
-      color: #555; 
+      color: #555;
 }
 
+.card-text {
+      height: 60px;
+}
 .reviewall {
       margin-bottom: 10px;
       border-radius: 8px;
@@ -117,7 +120,7 @@ nav {
       font-weight: bold;
       margin: 0;
       padding-top: 10px;
-      font-size: 0.8em; 
+      font-size: 0.8em;
 }
 
 .authorinformation {
@@ -127,17 +130,18 @@ nav {
 
 .total {
       color: #555;
-      font-size: 0.6em; 
-      text-align: center; 
-      margin: 0; 
-      padding: 0; 
+      font-size: 0.77em;
+      text-align: center;
+      margin: 0;
+      padding: 0;
 }
 
 .total-scale {
       color: #555;
-      font-size: 0.7em;
+      font-size: 0.8em;
       margin: 0;
       padding: 0;
+      margin-left: 5px;
 }
 .reviewdate {
       color: #555;
@@ -168,7 +172,7 @@ nav {
       width: 80px;
       height: 8px;
       margin: 0;
-      padding: 0; 
+      padding: 0;
 }
 
 .progess-row {
@@ -177,52 +181,57 @@ nav {
 }
 
 .total-rating-box {
-      width: 30%; 
-      margin: 0; 
-      margin-left: 80px; 
-      padding: 0; 
+      width: 30%;
+      margin: 0;
+      margin-left: 60px;
+      padding: 0;
 }
 
 .total-rating {
-      text-align: center; 
-      margin: 0; 
-      margin-top: -7px; 
-      padding: 0; 
+      text-align: center;
+      margin: 0;
+      margin-top: -3px;
+      padding: 0;
 }
 
-
 .corporate {
-      background-color: white; 
+      background-color: white;
       border-radius: 8px;
       padding: 10px;
-      margin-right: 10px; 
-      margin-bottom: 10px; 
-      margin-left: 20px; 
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-left: 20px;
 }
 
 .corporatename {
       color: #555;
       font-weight: bolder;
       font-size: 0.7em;
-      margin-top: -15px; 
+      margin-top: -15px;
       margin-bottom: 0;
 }
 
 .corporatetext {
       color: #555;
       font-size: 0.9em;
-      margin-left: 15px; 
+      margin-left: 15px;
 }
 
 .corporatedate {
       color: #555;
       font-size: 0.7em;
       margin-left: 50px;
-      margin-top: -35px; 
+      margin-top: -35px;
 }
 
 .verified {
-      height: 20px !important; 
-      margin-top: 30px; 
-      margin-left: -25px; 
+      height: 20px !important;
+      margin-top: 30px;
+      margin-left: -25px;
+}
+
+.scrollbar {
+      height: 500px;
+      overflow: scroll;
+      margin-top: 20px;
 }

@@ -9,6 +9,10 @@ let corporateRevealed = false;
 // Array für die Unblur-Reihenfolge
 let revealOrder = [];
 
+// Zeittracking: Startzeiten
+let revealTimes = {};
+let pageLoadTime = Date.now();
+
 // Sichtbare Liste im DOM anlegen (falls noch nicht vorhanden)
 function ensureRevealList(){
   let list = document.getElementById('reveal-order-list');
@@ -19,7 +23,7 @@ function ensureRevealList(){
     container.style.position = 'fixed';
     container.style.right = '10px';
     container.style.top = '10px';
-    container.style.maxWidth = '220px';
+    container.style.maxWidth = '240px';
     container.style.zIndex = '9999';
     container.style.background = 'rgba(255,255,255,0.95)';
     container.style.padding = '8px';
@@ -32,13 +36,31 @@ function ensureRevealList(){
   return list;
 }
 
-// Hilfsfunktion: Reihenfolge loggen (Konsole + DOM)
+// Hilfsfunktion: Reihenfolge loggen (Konsole + DOM) + Dauer
 function logReveal(elementName) {
+  const now = Date.now();
+  let duration = 0;
+
+  if (revealOrder.length === 0) {
+    // Erste Dauer: Zeit seit Seitenaufruf
+    duration = ((now - pageLoadTime) / 1000).toFixed(1);
+    console.log(`Erstes Unblur: "${elementName}" nach ${duration} Sekunden`);
+  } else {
+    const lastElement = revealOrder[revealOrder.length - 1];
+    if (revealTimes[lastElement]) {
+      duration = ((now - revealTimes[lastElement]) / 1000).toFixed(1);
+      console.log(`Verweildauer auf "${lastElement}": ${duration} Sekunden`);
+    }
+  }
+
+  // Neues Element ins Array pushen
   revealOrder.push(elementName);
-  console.log("Reihenfolge des Unblurrens:", revealOrder.join(" → "));
+  revealTimes[elementName] = now;
+
+  // DOM-Liste aktualisieren mit Dauer
   const list = ensureRevealList();
   const li = document.createElement('li');
-  li.textContent = `${revealOrder.length}. ${elementName}`;
+  li.innerHTML = `${revealOrder.length}. ${elementName} <em>(${duration}s)</em>`;
   list.appendChild(li);
 }
 
@@ -51,7 +73,6 @@ function buttonClicked() {
 
 // Reveal-Funktionen mit zusätzlichen Logs
 function revealStars() {
-  console.log("revealStars() called");
   if (!starsRevealed) {
     document.querySelectorAll(".star-rating").forEach((el) => el.classList.remove("blurred"));
     starsRevealed = true;
@@ -62,7 +83,6 @@ function revealStars() {
 }
 
 function revealReviews() {
-  console.log("revealReviews() called");
   if (!reviewsRevealed) {
     document.querySelectorAll('.review').forEach(el => el.classList.remove('blurred'));
     reviewsRevealed = true;
@@ -73,7 +93,6 @@ function revealReviews() {
 }
 
 function revealAuthor() {
-  console.log("revealAuthor() called");
   if (!authorboxRevealed) {
     document.querySelectorAll(".authorbox").forEach((el) => el.classList.remove("blurred"));
     authorboxRevealed = true;
@@ -84,7 +103,6 @@ function revealAuthor() {
 }
 
 function revealTotalrating() {
-  console.log("revealTotalrating() called");
   if (!totalratingRevealed) {
     document.querySelectorAll(".total-rating").forEach((el) => el.classList.remove("blurred"));
     totalratingRevealed = true;
@@ -95,7 +113,6 @@ function revealTotalrating() {
 }
 
 function revealTotalscale() {
-  console.log("revealTotalscale() called");
   if (!totalscaleRevealed) {
     document.querySelectorAll(".total-scale").forEach((el) => el.classList.remove("blurred"));
     totalscaleRevealed = true;
@@ -106,7 +123,6 @@ function revealTotalscale() {
 }
 
 function revealCorporate() {
-  console.log("revealCorporate() called");
   if (!corporateRevealed) {
     document.querySelectorAll(".corporate").forEach((el) => el.classList.remove("blurred"));
     corporateRevealed = true;
@@ -130,30 +146,23 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   console.log("Elementcounts:", counts);
 
-  // Event-Delegation: ein Listener am body, robuster als clones/replaceChild
+  // Event-Delegation: ein Listener am body
   document.body.addEventListener('click', (e) => {
     if (e.target.closest('.star-rating')) {
-      console.log('Click detected on .star-rating');
       revealStars();
     } else if (e.target.closest('.review')) {
-      console.log('Click detected on .review');
       revealReviews();
     } else if (e.target.closest('.authorbox')) {
-      console.log('Click detected on .authorbox');
       revealAuthor();
     } else if (e.target.closest('.total-rating')) {
-      console.log('Click detected on .total-rating');
       revealTotalrating();
     } else if (e.target.closest('.total-scale')) {
-      console.log('Click detected on .total-scale');
       revealTotalscale();
     } else if (e.target.closest('.corporate')) {
-      console.log('Click detected on .corporate');
       revealCorporate();
     }
   });
 
-  // Optional: Wenn du das ursprüngliche Clonen weiter bevorzugst, kannst du es behalten.
   // Shuffle der Hotelkarten nur, wenn Container existiert
   const container = document.querySelector(".row.g-4");
   if (!container) {
