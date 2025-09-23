@@ -6,6 +6,24 @@ let totalratingRevealed = false;
 let totalscaleRevealed = false;
 let corporateRevealed = false;
 
+// Parent-Origin = SoSciSurvey
+const PARENT_ORIGIN = "https://www.soscisurvey.de"; // ggf. anpassen
+
+function sendTrackingToParent() {
+  if (window.parent && window.parent !== window) {
+    const payload = {
+      revealOrder,
+      revealTimes,
+      pageLoadTime
+    };
+    window.parent.postMessage(
+      { type: "revealTracking", payload },
+      PARENT_ORIGIN
+    );
+    console.log("Iframe -> Parent gesendet:", payload);
+  }
+}
+
 // Array für die Unblur-Reihenfolge
 let revealOrder = [];
 
@@ -62,6 +80,9 @@ function logReveal(elementName) {
   const li = document.createElement('li');
   li.innerHTML = `${revealOrder.length}. ${elementName} <em>(${duration}s)</em>`;
   list.appendChild(li);
+  
+  // Tracking-Daten an SoSci übergeben
+  sendTrackingToParent();
 }
 
 function buttonClicked() {
