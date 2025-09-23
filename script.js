@@ -7,7 +7,7 @@ let totalscaleRevealed = false;
 let corporateRevealed = false;
 
 // Parent-Origin = SoSciSurvey
-const PARENT_ORIGIN = "https://www.soscisurvey.de"; // ggf. anpassen
+const PARENT_ORIGIN = "https://sosci.rlp.net";
 
 function sendTrackingToParent() {
   if (window.parent && window.parent !== window) {
