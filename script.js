@@ -6,195 +6,157 @@ let totalratingRevealed = false;
 let totalscaleRevealed = false;
 let corporateRevealed = false;
 
-// Parent-Origin = SoSciSurvey
+// =======================
+// Maus-Tracking (datenarm)
+// =======================
+let mouseTrack = [];
+let lastMouseSampleTime = 0;
+const MOUSE_SAMPLE_INTERVAL = 200; // 5 Hz
+
+// =======================
+// Reveal-Tracking
+// =======================
+let revealOrder = [];
+let revealTimes = {};
+let pageLoadTime = Date.now();
+let lastRevealTime = pageLoadTime;
+
+// =======================
+// SoSci / iFrame Kommunikation
+// =======================
 const PARENT_ORIGIN = "https://sosci.rlp.net";
 
 function sendTrackingToParent() {
   if (window.parent && window.parent !== window) {
-    const payload = {
-      revealOrder,
-      revealTimes,
-      pageLoadTime
-    };
     window.parent.postMessage(
-      { type: "revealTracking", payload },
+      {
+        type: "revealTracking",
+        payload: {
+          revealOrder,
+          revealTimes,
+          mouseTrack
+        }
+      },
       PARENT_ORIGIN
     );
-    console.log("Iframe -> Parent gesendet:", payload);
   }
 }
 
-// Array für die Unblur-Reihenfolge
-let revealOrder = [];
-
-// Zeittracking: Startzeiten
-let revealTimes = {};
-let pageLoadTime = Date.now();
-
-// Sichtbare Liste im DOM anlegen (falls noch nicht vorhanden)
-function ensureRevealList(){
-  let list = document.getElementById('reveal-order-list');
-  if (!list) {
-    const container = document.createElement('div');
-    container.id = 'reveal-order-container';
-
-    container.style.position = 'fixed';
-    container.style.right = '10px';
-    container.style.top = '10px';
-    container.style.maxWidth = '240px';
-    container.style.zIndex = '9999';
-    container.style.background = 'rgba(255,255,255,0.95)';
-    container.style.padding = '8px';
-    container.style.border = '1px solid #ccc';
-    container.style.fontSize = '12px';
-    container.innerHTML = '<strong>Unblur Reihenfolge:</strong><ol id="reveal-order-list" style="margin:6px 0; padding-left:20px;"></ol>';
-    document.body.appendChild(container);
-    list = document.getElementById('reveal-order-list');
-  }
-  return list;
-}
-
-// Hilfsfunktion: Reihenfolge loggen (Konsole + DOM) + Dauer
+// =======================
+// Logging Reveal + Dauer
+// =======================
 function logReveal(elementName) {
   const now = Date.now();
-  let duration = 0;
+  let duration;
 
   if (revealOrder.length === 0) {
-    // Erste Dauer: Zeit seit Seitenaufruf
-    duration = ((now - pageLoadTime) / 1000).toFixed(1);
-    console.log(`Erstes Unblur: "${elementName}" nach ${duration} Sekunden`);
+    duration = (now - pageLoadTime) / 1000;
   } else {
-    const lastElement = revealOrder[revealOrder.length - 1];
-    if (revealTimes[lastElement]) {
-      duration = ((now - revealTimes[lastElement]) / 1000).toFixed(1);
-      console.log(`Verweildauer auf "${lastElement}": ${duration} Sekunden`);
-    }
+    duration = (now - lastRevealTime) / 1000;
   }
 
-  // Neues Element ins Array pushen
   revealOrder.push(elementName);
-  revealTimes[elementName] = now;
+  revealTimes[elementName] = Number(duration.toFixed(1));
+  lastRevealTime = now;
 
-  // DOM-Liste aktualisieren mit Dauer
-  const list = ensureRevealList();
-  const li = document.createElement('li');
-  li.innerHTML = `${revealOrder.length}. ${elementName} <em>(${duration}s)</em>`;
-  list.appendChild(li);
-  
-  // Tracking-Daten an SoSci übergeben
+  // Übergabe an SoSci
   sendTrackingToParent();
+
+  // Mouse-Tracking beenden, wenn alles offen
+  if (
+    starsRevealed &&
+    reviewsRevealed &&
+    authorboxRevealed &&
+    totalratingRevealed &&
+    totalscaleRevealed &&
+    corporateRevealed
+  ) {
+    document.removeEventListener("mousemove", trackMouseMovement);
+  }
 }
 
-function buttonClicked() {
-  numButtonClicks += 1;
-  const main = document.getElementById("mainDiv");
-  if (main) main.textContent = "Button Clicked times: " + numButtonClicks;
-  console.log("buttonClicked:", numButtonClicks);
-}
-
-// Reveal-Funktionen mit zusätzlichen Logs
+// =======================
+// Reveal-Funktionen
+// =======================
 function revealStars() {
   if (!starsRevealed) {
-    document.querySelectorAll(".star-rating").forEach((el) => el.classList.remove("blurred"));
+    document.querySelectorAll(".star-rating").forEach(el => el.classList.remove("blurred"));
     starsRevealed = true;
     logReveal("Sternebewertung");
-  } else {
-    console.log("Sterne schon offen");
   }
 }
 
 function revealReviews() {
   if (!reviewsRevealed) {
-    document.querySelectorAll('.review').forEach(el => el.classList.remove('blurred'));
+    document.querySelectorAll(".review").forEach(el => el.classList.remove("blurred"));
     reviewsRevealed = true;
     logReveal("Einzelrezensionen");
-  } else {
-    console.log("Reviews schon offen");
   }
 }
 
 function revealAuthor() {
   if (!authorboxRevealed) {
-    document.querySelectorAll(".authorbox").forEach((el) => el.classList.remove("blurred"));
+    document.querySelectorAll(".authorbox").forEach(el => el.classList.remove("blurred"));
     authorboxRevealed = true;
     logReveal("Autoreninformationen");
-  } else {
-    console.log("Authorbox schon offen");
   }
 }
 
 function revealTotalrating() {
   if (!totalratingRevealed) {
-    document.querySelectorAll(".total-rating").forEach((el) => el.classList.remove("blurred"));
+    document.querySelectorAll(".total-rating").forEach(el => el.classList.remove("blurred"));
     totalratingRevealed = true;
     logReveal("Gesamtbewertungen");
-  } else {
-    console.log("Totalrating schon offen");
   }
 }
 
 function revealTotalscale() {
   if (!totalscaleRevealed) {
-    document.querySelectorAll(".total-scale").forEach((el) => el.classList.remove("blurred"));
+    document.querySelectorAll(".total-scale").forEach(el => el.classList.remove("blurred"));
     totalscaleRevealed = true;
     logReveal("Bewertungsskala");
-  } else {
-    console.log("Totalscale schon offen");
   }
 }
 
 function revealCorporate() {
   if (!corporateRevealed) {
-    document.querySelectorAll(".corporate").forEach((el) => el.classList.remove("blurred"));
+    document.querySelectorAll(".corporate").forEach(el => el.classList.remove("blurred"));
     corporateRevealed = true;
     logReveal("Unternehmenskommentar");
-  } else {
-    console.log("Corporate schon offen");
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM ready - initialisiere Listener und prüfe Elemente");
+// =======================
+// Mouse-Tracking Funktion
+// =======================
+function trackMouseMovement(event) {
+  const now = Date.now();
+  if (now - lastMouseSampleTime < MOUSE_SAMPLE_INTERVAL) return;
+  lastMouseSampleTime = now;
 
-  // Debug: Zähle vorhandene Elemente
-  const counts = {
-    stars: document.querySelectorAll('.star-rating').length,
-    reviews: document.querySelectorAll('.review').length,
-    authorbox: document.querySelectorAll('.authorbox').length,
-    totalrating: document.querySelectorAll('.total-rating').length,
-    totalscale: document.querySelectorAll('.total-scale').length,
-    corporate: document.querySelectorAll('.corporate').length,
-  };
-  console.log("Elementcounts:", counts);
-
-  // Event-Delegation: ein Listener am body
-  document.body.addEventListener('click', (e) => {
-    if (e.target.closest('.star-rating')) {
-      revealStars();
-    } else if (e.target.closest('.review')) {
-      revealReviews();
-    } else if (e.target.closest('.authorbox')) {
-      revealAuthor();
-    } else if (e.target.closest('.total-rating')) {
-      revealTotalrating();
-    } else if (e.target.closest('.total-scale')) {
-      revealTotalscale();
-    } else if (e.target.closest('.corporate')) {
-      revealCorporate();
-    }
+  mouseTrack.push({
+    t: Math.round((now - pageLoadTime) / 1000),
+    x: Number((event.clientX / window.innerWidth).toFixed(3)),
+    y: Number((event.clientY / window.innerHeight).toFixed(3)),
+    phase: revealOrder.length
   });
+}
 
-  // Shuffle der Hotelkarten nur, wenn Container existiert
-  const container = document.querySelector(".row.g-4");
-  if (!container) {
-    console.warn("Container .row.g-4 nicht gefunden — Shuffle übersprungen");
-    return;
-  }
-  const cards = Array.from(container.children);
-  for (let i = cards.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
-  }
-  container.innerHTML = "";
-  cards.forEach((card) => container.appendChild(card));
+// =======================
+// Initialisierung
+// =======================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Mouse-Tracking starten
+  document.addEventListener("mousemove", trackMouseMovement);
+
+  // Event-Delegation für Reveals
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest(".star-rating")) revealStars();
+    else if (e.target.closest(".review")) revealReviews();
+    else if (e.target.closest(".authorbox")) revealAuthor();
+    else if (e.target.closest(".total-rating")) revealTotalrating();
+    else if (e.target.closest(".total-scale")) revealTotalscale();
+    else if (e.target.closest(".corporate")) revealCorporate();
+  });
 });
