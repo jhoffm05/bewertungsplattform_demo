@@ -13,7 +13,7 @@ nav {
 
 .star {
       color: gold;
-      font-size: 1.2em;
+      font-size: 1 em;
       margin: 0;
       padding: 0;
 }
@@ -37,6 +37,17 @@ nav {
       filter: blur(3px);
       cursor: pointer;
       transition: filter 0.3s ease;
+      color: grey !important; 
+      
+}
+
+
+.blurredx5 {
+      filter: blur(6px);
+      cursor: pointer;
+      transition: filter 0.3s ease;
+      color: grey !important; 
+      
 }
 
 .card-title {
@@ -58,9 +69,9 @@ nav {
       background: #e0ebe5;
 }
 
-.authorbox img {
-      height: 40px;
+.avatar  {
       border-radius: 50%;
+      margin-left: 5%; 
 }
 
 .corporate img {
@@ -69,14 +80,13 @@ nav {
 }
 
 .reviewstar {
-      padding: 0;
-      margin-left: 75px;
-      display: inline;
-      vertical-align: top;
-      color: #516c76;
+      color: #555;
+      margin-left: -1%; 
 }
 
-.authorinformation {
+
+
+.authorinformationzeile {
       padding: 0;
       margin: 0;
       display: inline;
@@ -90,9 +100,6 @@ nav {
       vertical-align: top;
 }
 
-.reviewer img {
-      display: inline;
-}
 
 .authorbox {
       display: flex;
@@ -100,8 +107,13 @@ nav {
       gap: 16px;
 }
 
+
+.reviewer img {
+      display: inline;
+}
+
 .authorbox img {
-      width: 60px;
+      width: 25%;
       height: auto;
       object-fit: cover;
       flex-shrink: 0;
@@ -114,13 +126,14 @@ nav {
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
+      margin-left: -65%;
+      padding-top: 2%; 
 }
 
 .authorname {
       font-weight: bold;
       margin: 0;
-      padding-top: 10px;
-      font-size: 0.8em;
+      font-size: 0.9em;
 }
 
 .authorinformation {
@@ -143,7 +156,7 @@ nav {
       padding: 0;
       margin-left: 5px;
 }
-.reviewdate {
+.reviewdate, .verifizierung {
       color: #555;
       font-size: 0.9em;
       margin-bottom: 0;
@@ -151,10 +164,10 @@ nav {
 
 .reviewtext {
       margin-top: 10px;
-      margin-left: 20px;
+      margin-left: 16.4%;
       margin-right: 10px;
-      font-style: italic;
-      color: #516c76;
+      margin-bottom: 1%; 
+      color: #555;
 }
 
 .rating-row {
@@ -198,7 +211,7 @@ nav {
       background-color: white;
       border-radius: 8px;
       padding: 10px;
-      margin-right: 10px;
+      margin-right: 5px;
       margin-bottom: 10px;
       margin-left: 20px;
 }
@@ -206,7 +219,7 @@ nav {
 .corporatename {
       color: #555;
       font-weight: bolder;
-      font-size: 0.7em;
+      font-size: 0.8em;
       margin-top: -15px;
       margin-bottom: 0;
 }
@@ -235,3 +248,61 @@ nav {
       overflow: scroll;
       margin-top: 20px;
 }
+
+
+#startOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ki-text {
+      color: #516c76;
+}
+
+.ki-headline {
+      font-size: 1.1em;
+      font-style: bold;
+      margin-top: 5%;
+}
+
+.ki-hinweis {
+      font-size: 0.8em;
+      font-style: oblique;
+}
+
+.ki-box {
+      background-color: rgba(81, 108, 118, 0.1); 
+      color: #516c76;
+      margin-left: -6%; 
+      margin-right: -6%; 
+      margin-top: 5%; 
+      padding-left: 10%;
+      padding-right: 10%;
+      padding-top: 0.1%; 
+      padding-bottom: 0.1%; 
+}
+
+.hilfreichzeile {
+      font-size: 0.9em; 
+      /*background-color: rgba(85, 85, 85, 0.1);*/
+      padding: 1%; 
+      padding-left: 18.5%; 
+      margin-left: -2%;
+      margin-right: -2%;
+}
+
+.hilfreich {
+      font-size: 0.9em; 
+
+
+}
+
+
