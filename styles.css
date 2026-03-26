@@ -1,9 +1,39 @@
+body {
+      background-color: #ffffff;
+}
+
 h1 {
       color: #516c76;
 }
 
 nav {
       background-color: #e0ebe5;
+}
+
+#navbar {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  background-color: #333;
+  z-index: 1000;
+      display: flex;
+  justify-content: center; /* horizontal */
+  align-items: center; 
+}
+
+#navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;      
+}
+
+#navbar a:hover {
+  background-color: #ddd;
+  color: black;
 }
 
 .navbar img {
@@ -16,6 +46,7 @@ nav {
       font-size: 1 em;
       margin: 0;
       padding: 0;
+      font-weight: bold;
 }
 
 .star-rating {
@@ -37,17 +68,21 @@ nav {
       filter: blur(3px);
       cursor: pointer;
       transition: filter 0.3s ease;
-      color: grey !important; 
-      
+      color: grey !important;
 }
-
 
 .blurredx5 {
       filter: blur(6px);
       cursor: pointer;
       transition: filter 0.3s ease;
-      color: grey !important; 
-      
+      color: grey !important;
+}
+
+.blurredx10 {
+      filter: blur(10px);
+      cursor: pointer;
+      transition: filter 0.3s ease;
+      color: grey !important;
 }
 
 .card-title {
@@ -69,9 +104,9 @@ nav {
       background: #e0ebe5;
 }
 
-.avatar  {
+.avatar {
       border-radius: 50%;
-      margin-left: 5%; 
+      margin-left: 3%;
 }
 
 .corporate img {
@@ -81,14 +116,13 @@ nav {
 
 .reviewstar {
       color: #555;
-      margin-left: -1%; 
+      margin-left: -1%;
 }
-
-
 
 .authorinformationzeile {
       padding: 0;
       margin: 0;
+      margin-top: -3px;
       display: inline;
       vertical-align: top;
 }
@@ -98,15 +132,15 @@ nav {
       margin: 0;
       display: inline;
       vertical-align: top;
+      
+      
 }
-
 
 .authorbox {
       display: flex;
       align-items: flex-start;
       gap: 16px;
 }
-
 
 .reviewer img {
       display: inline;
@@ -126,8 +160,8 @@ nav {
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
-      margin-left: -65%;
-      padding-top: 2%; 
+      margin-left: -70%;
+      padding-top: 2%;
 }
 
 .authorname {
@@ -156,7 +190,8 @@ nav {
       padding: 0;
       margin-left: 5px;
 }
-.reviewdate, .verifizierung {
+.reviewdate,
+.verifizierung {
       color: #555;
       font-size: 0.9em;
       margin-bottom: 0;
@@ -164,9 +199,9 @@ nav {
 
 .reviewtext {
       margin-top: 10px;
-      margin-left: 16.4%;
+      margin-left: 8%;
       margin-right: 10px;
-      margin-bottom: 1%; 
+      margin-bottom: 3%;
       color: #555;
 }
 
@@ -249,18 +284,17 @@ nav {
       margin-top: 20px;
 }
 
-
 #startOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #ffffff;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 }
 
 .ki-text {
@@ -279,30 +313,90 @@ nav {
 }
 
 .ki-box {
-      background-color: rgba(81, 108, 118, 0.1); 
+      background-color: rgba(81, 108, 118, 0.1);
       color: #516c76;
-      margin-left: -6%; 
-      margin-right: -6%; 
-      margin-top: 5%; 
+      margin-left: -6%;
+      margin-right: -6%;
+      margin-top: 5%;
       padding-left: 10%;
       padding-right: 10%;
-      padding-top: 0.1%; 
-      padding-bottom: 0.1%; 
+      padding-top: 0.1%;
+      padding-bottom: 0.1%;
 }
 
 .hilfreichzeile {
-      font-size: 0.9em; 
+      font-size: 0.8em;
       /*background-color: rgba(85, 85, 85, 0.1);*/
-      padding: 1%; 
-      padding-left: 18.5%; 
+      padding: 1%;
+      padding-left: 10%;
       margin-left: -2%;
       margin-right: -2%;
 }
 
 .hilfreich {
-      font-size: 0.9em; 
+      font-size: 0.9em;
+}
 
+.blue_bg {
+      border-color: rgb(0, 22, 218);
+      border-style: solid;
+      border-width: medium;
+}
 
+.grey_bg {
+      border-color: rgb(153, 153, 153);
+      border-style: solid;
+      border-width: medium;
+}
+
+.brown_bg {
+      border-color: rgb(255, 92, 0);
+      border-style: solid;
+      border-width: medium;
+}
+
+.usercontent {
+      height: 30%;
+      width: 60%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 13px;
+      margin-left: 16%;
+      margin-top: 3%;
+      margin-bottom: 3%;
+}
+
+.only-mobile {
+      display: none;
+}
+
+/* Anpassungen für mobil */
+
+@media only screen and (max-width: 767px) {
+      body {
+            background-color: #516a73;
+      }
+
+      h1 {
+            color: #ffffff;
+      }
+
+      .marg-top {
+            margin-top: 120px;
+      }
+      
+      .scrollbar {
+      height: 420px;
+      }
+      
+      .row {
+            padding-top: 0;
+            margin-top: -120px; 
+      }
+      
+      .only-mobile {
+            display: block;
+      }
 }
 
 

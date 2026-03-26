@@ -18,7 +18,7 @@ const CONFIG = {
 const TRACKABLE_SELECTORS = [
   ".star-rating", ".total-rating", ".total-scale", ".reviewstar",
   ".reviewtext", ".corporate", ".ki-box", ".authorname",
-  ".authorinformation", ".reviewdate", ".avatar", ".hilfreich", ".verifizierung"
+  ".authorinformation", ".reviewdate", ".avatar", ".hilfreich", ".verifizierung", ".usercontent"
 ];
 
 /*========================================
@@ -28,18 +28,19 @@ const TRACKABLE_SELECTORS = [
 // Mapping: Key -> { selector, blurClass, label, overlayText }
 const REVEAL_CONFIG = {
   stars:             { selector: ".star-rating",       blur: "blurred",   label: "Sternebewertung",             overlayText: "★★★★★" },
-  reviewstar:        { selector: ".reviewstar",        blur: "blurredx5", label: "Einzelne Sternebewertung",   overlayText: "★★★★★" },
-  reviewtext:        { selector: ".reviewtext",        blur: "blurred",   label: "Einzelrezension Text",       overlayText: "Rezensionstext" },
-  totalrating:       { selector: ".total-rating",      blur: "blurred",   label: "Gesamtbewertung",            overlayText: "Anzahl" },
-  totalscale:        { selector: ".total-scale",       blur: "blurredx5", label: "Bewertungsskala",            overlayText: "Bewertungsskala" },
+  reviewstar:        { selector: ".reviewstar",        blur: "blurredx5", label: "Einzelne Sternebewertung",    overlayText: "★★★★★" },
+  reviewtext:        { selector: ".reviewtext",        blur: "blurred",   label: "Einzelrezension Text",        overlayText: "Rezensionstext" },
+  totalrating:       { selector: ".total-rating",      blur: "blurred",   label: "Gesamtbewertung",             overlayText: "Anzahl" },
+  totalscale:        { selector: ".total-scale",       blur: "blurredx5", label: "Bewertungsskala",             overlayText: "Bewertungsskala" },
   corporate:         { selector: ".corporate",         blur: "blurred",   label: "Unternehmenskommentar",       overlayText: "Unternehmenskommentar" },
   ki:                { selector: ".ki-box",            blur: "blurred",   label: "KI-Zusammenfassung",          overlayText: "KI‑Zusammenfassung" },
   authorname:        { selector: ".authorname",        blur: "blurred",   label: "Rezensent:in Name",           overlayText: "Autor/in" },
   authorinformation: { selector: ".authorinformation", blur: "blurred",   label: "Rezensent:in Informationen",  overlayText: "Autor/in Informationen" },
   reviewdate:        { selector: ".reviewdate",        blur: "blurred",   label: "Rezension Datum",             overlayText: "Veröffentlichung" },
   hilfreich:         { selector: ".hilfreich",         blur: "blurred",   label: "Hilfreich",                   overlayText: "..." },
-  avatar:            { selector: ".avatar",            blur: "blurredx5", label: "Profilbild",                   overlayText: "Profilbild" },
-  verifizierung:     { selector: ".verifizierung",     blur: "blurred",   label: "Rezensent:in Verifizierung",  overlayText: "Verifizierung" }
+  avatar:            { selector: ".avatar",            blur: "blurredx5", label: "Profilbild",                  overlayText: "Profilbild" },
+  verifizierung:     { selector: ".verifizierung",     blur: "blurred",   label: "Rezensent:in Verifizierung",  overlayText: "Verifizierung" },
+  usercontent:       { selector: ".usercontent",       blur: "blurredx10", label: "Beitragsbilder",              overlayText: "Beitragsbilder" }
 };
 
 /*========================================
@@ -54,7 +55,7 @@ const revealedElements = {
   stars: false, reviewstar: false, reviewtext: false, totalrating: false,
   totalscale: false, corporate: false, ki: false, authorname: false,
   authorinformation: false, reviewdate: false, hilfreich: false,
-  avatar: false, verifizierung: false
+  avatar: false, verifizierung: false, usercontent: false
 };
 
 // Tracking-Daten
@@ -107,7 +108,9 @@ function postToParent(type, payload) {
   BLUR-LABELS (Overlay über geblurrten Feldern)
 ========================================*/
 function isBlurredElement(el) {
-  return el.classList.contains("blurred") || el.classList.contains("blurredx5");
+  return el.classList.contains("blurred") || 
+         el.classList.contains("blurredx5") || 
+         el.classList.contains("blurredx10");
 }
 
 function ensureBlurLabelWrapper(el) {
@@ -157,7 +160,6 @@ function addBlurLabel(el, text, key) {
   // Nur anzeigen, wenn wirklich geblurrt
   label.style.display = isBlurredElement(el) ? "flex" : "none";
   
-  // NEU: Linksbündige Ausrichtung für authorinfo, avatar UND total-scale
   if (
     el.closest(".authorinfo") || 
     el.classList.contains("avatar") || 
@@ -216,6 +218,42 @@ function formatRevealOrder() {
   }, {});
 }
 
+/**
+ * Erstellt numerische Rangvariablen
+ * für jedes eWOM-Element (SoSci-kompatibel)
+ *
+ * Ergebnis:
+ * {
+ *   rank_stars: 1,
+ *   rank_reviewtext: 3,
+ *   rank_ki: 0
+ * }
+ */
+function formatRevealRanksNumeric() {
+
+  const ranks = {};
+
+  // alle Elemente initial = 0 (nicht geöffnet)
+  Object.keys(REVEAL_CONFIG).forEach(key => {
+    ranks[`rank_${key}`] = 0;
+  });
+
+  // tatsächliche Rangposition eintragen
+  revealOrder.forEach((label, index) => {
+
+    // Label → Key zurückübersetzen
+    const entry = Object.entries(REVEAL_CONFIG)
+      .find(([k, v]) => v.label === label);
+
+    if (entry) {
+      const key = entry[0];
+      ranks[`rank_${key}`] = index + 1;
+    }
+  });
+
+  return ranks;
+}
+
 /*========================================
   INTERAKTIONS-LOGGING
 ========================================*/
@@ -271,6 +309,7 @@ function logReveal(elementName) {
   postToParent("revealTracking", {
     revealOrder: formatRevealOrder(),
     revealTimes: formatRevealTimes(),
+    revealRanks: formatRevealRanksNumeric(),
     pageLoadTime: 0.0
   });
 }
@@ -456,6 +495,7 @@ function endTracking() {
     mouseHeatmapElements,
     revealOrder: formatRevealOrder(),
     revealTimes: formatRevealTimes(),
+    revealRanks: formatRevealRanksNumeric(),
     pageLoadTime: 0.0,
     startButtonDurationMs,
     endButtonDurationMs,
@@ -571,9 +611,9 @@ document.addEventListener("DOMContentLoaded", () => {
   closeBtn.id = "closeTrackingButton";
   closeBtn.textContent = "Fenster schließen";
   closeBtn.style.cssText = `
-    position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
-    z-index:99999;padding:16px 36px;background:#dc3545;color:#fff;
-    border:none;border-radius:12px;cursor:pointer;font-size:18px;
+    position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
+    z-index:99999;padding:8px 18px;background:#dc3545;color:#fff;
+    border:none;border-radius:12px;cursor:pointer;font-size:14px;
     font-weight:bold;box-shadow:0 6px 20px rgba(0,0,0,0.3);display:none;
   `;
   closeBtn.addEventListener("click", endTracking);
