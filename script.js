@@ -9,16 +9,27 @@ const TRACKING_VISIBILITY = "off"; // "on" oder "off"
   KONFIGURATION & KONSTANTEN
 ========================================*/
 const CONFIG = {
-  maxTrackingTimeMs: 7 * 60 * 1000,  // Max. Tracking-Dauer: 7 Minuten
-  mouseSampleInterval: 200,           // Maus-Sampling alle 200ms
+  maxTrackingTimeMs: 7 * 60 * 1000, // Max. Tracking-Dauer: 7 Minuten
+  mouseSampleInterval: 200, // Maus-Sampling alle 200ms
   parentOrigin: "https://sosci.rlp.net"
 };
 
 // Trackbare CSS-Selektoren
 const TRACKABLE_SELECTORS = [
-  ".star-rating", ".total-rating", ".total-scale", ".reviewstar",
-  ".reviewtext", ".corporate", ".ki-box", ".authorname",
-  ".authorinformation", ".reviewdate", ".avatar", ".hilfreich", ".verifizierung", ".usercontent"
+  ".star-rating",
+  ".total-rating",
+  ".total-scale",
+  ".reviewstar",
+  ".reviewtext",
+  ".corporate",
+  ".ki-box",
+  ".authorname",
+  ".authorinformation",
+  ".reviewdate",
+  ".avatar",
+  ".hilfreich",
+  ".verifizierung",
+  ".usercontent"
 ];
 
 /*========================================
@@ -27,20 +38,40 @@ const TRACKABLE_SELECTORS = [
 
 // Mapping: Key -> { selector, blurClass, label, overlayText }
 const REVEAL_CONFIG = {
-  stars:             { selector: ".star-rating",       blur: "blurred",   label: "Sternebewertung",             overlayText: "★★★★★" },
-  reviewstar:        { selector: ".reviewstar",        blur: "blurredx5", label: "Einzelne Sternebewertung",    overlayText: "★★★★★" },
-  reviewtext:        { selector: ".reviewtext",        blur: "blurred",   label: "Einzelrezension Text",        overlayText: "Rezensionstext" },
-  totalrating:       { selector: ".total-rating",      blur: "blurred",   label: "Gesamtbewertung",             overlayText: "Anzahl" },
-  totalscale:        { selector: ".total-scale",       blur: "blurredx5", label: "Bewertungsskala",             overlayText: "Bewertungsskala" },
-  corporate:         { selector: ".corporate",         blur: "blurred",   label: "Unternehmenskommentar",       overlayText: "Unternehmenskommentar" },
-  ki:                { selector: ".ki-box",            blur: "blurred",   label: "KI-Zusammenfassung",          overlayText: "KI‑Zusammenfassung" },
-  authorname:        { selector: ".authorname",        blur: "blurred",   label: "Rezensent:in Name",           overlayText: "Autor/in" },
-  authorinformation: { selector: ".authorinformation", blur: "blurred",   label: "Rezensent:in Informationen",  overlayText: "Autor/in Informationen" },
-  reviewdate:        { selector: ".reviewdate",        blur: "blurred",   label: "Rezension Datum",             overlayText: "Veröffentlichung" },
-  hilfreich:         { selector: ".hilfreich",         blur: "blurred",   label: "Hilfreich",                   overlayText: "..." },
-  avatar:            { selector: ".avatar",            blur: "blurredx5", label: "Profilbild",                  overlayText: "Profilbild" },
-  verifizierung:     { selector: ".verifizierung",     blur: "blurred",   label: "Rezensent:in Verifizierung",  overlayText: "Verifizierung" },
-  usercontent:       { selector: ".usercontent",       blur: "blurredx10", label: "Beitragsbilder",              overlayText: "Beitragsbilder" }
+  stars: { selector: ".star-rating", blur: "blurred", label: "Sternebewertung", overlayText: "★★★★★" },
+  reviewstar: { selector: ".reviewstar", blur: "blurredx5", label: "Einzelne Sternebewertung", overlayText: "★★★★★" },
+  reviewtext: {
+    selector: ".reviewtext",
+    blur: "blurred",
+    label: "Einzelrezension Text",
+    overlayText: "Rezensionstext"
+  },
+  totalrating: { selector: ".total-rating", blur: "blurred", label: "Gesamtbewertung", overlayText: "Anzahl" },
+  totalscale: { selector: ".total-scale", blur: "blurredx5", label: "Bewertungsskala", overlayText: "Bewertungsskala" },
+  corporate: {
+    selector: ".corporate",
+    blur: "blurred",
+    label: "Unternehmenskommentar",
+    overlayText: "Unternehmenskommentar"
+  },
+  ki: { selector: ".ki-box", blur: "blurred", label: "KI-Zusammenfassung", overlayText: "KI‑Zusammenfassung" },
+  authorname: { selector: ".authorname", blur: "blurred", label: "Rezensent:in Name", overlayText: "Autor/in" },
+  authorinformation: {
+    selector: ".authorinformation",
+    blur: "blurred",
+    label: "Rezensent:in Informationen",
+    overlayText: "Autor/in Informationen"
+  },
+  reviewdate: { selector: ".reviewdate", blur: "blurred", label: "Rezension Datum", overlayText: "Veröffentlichung" },
+  hilfreich: { selector: ".hilfreich", blur: "blurred", label: "Hilfreich", overlayText: "..." },
+  avatar: { selector: ".avatar", blur: "blurredx5", label: "Profilbild", overlayText: "Profilbild" },
+  verifizierung: {
+    selector: ".verifizierung",
+    blur: "blurred",
+    label: "Rezensent:in Verifizierung",
+    overlayText: "Verifizierung"
+  },
+  usercontent: { selector: ".usercontent", blur: "blurredx10", label: "Beitragsbilder", overlayText: "Beitragsbilder" }
 };
 
 /*========================================
@@ -52,10 +83,20 @@ let layoutState = getLayoutState();
 
 // Reveal-Status für alle Elemente
 const revealedElements = {
-  stars: false, reviewstar: false, reviewtext: false, totalrating: false,
-  totalscale: false, corporate: false, ki: false, authorname: false,
-  authorinformation: false, reviewdate: false, hilfreich: false,
-  avatar: false, verifizierung: false, usercontent: false
+  stars: false,
+  reviewstar: false,
+  reviewtext: false,
+  totalrating: false,
+  totalscale: false,
+  corporate: false,
+  ki: false,
+  authorname: false,
+  authorinformation: false,
+  reviewdate: false,
+  hilfreich: false,
+  avatar: false,
+  verifizierung: false,
+  usercontent: false
 };
 
 // Tracking-Daten
@@ -108,9 +149,7 @@ function postToParent(type, payload) {
   BLUR-LABELS (Overlay über geblurrten Feldern)
 ========================================*/
 function isBlurredElement(el) {
-  return el.classList.contains("blurred") || 
-         el.classList.contains("blurredx5") || 
-         el.classList.contains("blurredx10");
+  return el.classList.contains("blurred") || el.classList.contains("blurredx5") || el.classList.contains("blurredx10");
 }
 
 function ensureBlurLabelWrapper(el) {
@@ -143,7 +182,7 @@ function addBlurLabel(el, text, key) {
     label = document.createElement("div");
     label.className = "blur-label";
     label.innerHTML = `<span class="blur-label__text"></span>`;
-    
+
     // NEU: Label wird klickbarer Button zum Enthüllen
     label.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -151,7 +190,7 @@ function addBlurLabel(el, text, key) {
         reveal(key);
       }
     });
-    
+
     wrapper.appendChild(label);
   }
 
@@ -159,12 +198,8 @@ function addBlurLabel(el, text, key) {
 
   // Nur anzeigen, wenn wirklich geblurrt
   label.style.display = isBlurredElement(el) ? "flex" : "none";
-  
-  if (
-    el.closest(".authorinfo") || 
-    el.classList.contains("avatar") || 
-    el.classList.contains("total-scale")
-  ) {
+
+  if (el.closest(".authorinfo") || el.classList.contains("avatar") || el.classList.contains("total-scale")) {
     label.classList.add("blur-label--left-aligned");
   } else {
     label.classList.remove("blur-label--left-aligned");
@@ -182,7 +217,7 @@ function removeBlurLabel(el) {
 // Geändert: Übergibt Key an addBlurLabel
 function initBlurLabels() {
   for (const [key, cfg] of Object.entries(REVEAL_CONFIG)) {
-    document.querySelectorAll(cfg.selector).forEach(el => {
+    document.querySelectorAll(cfg.selector).forEach((el) => {
       if (isBlurredElement(el)) {
         addBlurLabel(el, cfg.overlayText || cfg.label, key);
       }
@@ -230,20 +265,17 @@ function formatRevealOrder() {
  * }
  */
 function formatRevealRanksNumeric() {
-
   const ranks = {};
 
   // alle Elemente initial = 0 (nicht geöffnet)
-  Object.keys(REVEAL_CONFIG).forEach(key => {
+  Object.keys(REVEAL_CONFIG).forEach((key) => {
     ranks[`rank_${key}`] = 0;
   });
 
   // tatsächliche Rangposition eintragen
   revealOrder.forEach((label, index) => {
-
     // Label → Key zurückübersetzen
-    const entry = Object.entries(REVEAL_CONFIG)
-      .find(([k, v]) => v.label === label);
+    const entry = Object.entries(REVEAL_CONFIG).find(([k, v]) => v.label === label);
 
     if (entry) {
       const key = entry[0];
@@ -309,8 +341,8 @@ function logReveal(elementName) {
   postToParent("revealTracking", {
     revealOrder: formatRevealOrder(),
     revealTimes: formatRevealTimes(),
-    revealRanks: formatRevealRanksNumeric(),
-    pageLoadTime: 0.0
+    pageLoadTime: 0.0,
+    ...formatRevealRanksNumeric()
   });
 }
 
@@ -324,7 +356,7 @@ function reveal(key) {
   const config = REVEAL_CONFIG[key];
   if (!config) return;
 
-  document.querySelectorAll(config.selector).forEach(el => {
+  document.querySelectorAll(config.selector).forEach((el) => {
     el.classList.remove(config.blur);
     removeBlurLabel(el);
   });
@@ -357,13 +389,13 @@ function ensureHeatmapOverlay(el) {
 // Aktualisiert visuelle Heatmap (nur wenn sichtbar)
 function updateVisualHeatmap() {
   if (!isTrackingVisible()) return;
-  
+
   const values = Object.values(mouseHeatmapElements);
   if (!values.length) return;
 
   const maxVal = Math.max(...values);
-  TRACKABLE_SELECTORS.forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
+  TRACKABLE_SELECTORS.forEach((sel) => {
+    document.querySelectorAll(sel).forEach((el) => {
       ensureHeatmapOverlay(el);
       const key = buildElementKey(el, sel);
       const intensity = Math.min((mouseHeatmapElements[key] || 0) / maxVal, 1);
@@ -400,13 +432,15 @@ function trackMouse(event) {
 // Erstellt Reveal-Liste (nur wenn sichtbar)
 function ensureRevealList() {
   if (!isTrackingVisible()) return null;
-  
+
   let list = document.getElementById("reveal-order-list");
   if (!list) {
     const box = document.createElement("div");
     box.id = "reveal-order-box";
-    box.style.cssText = "position:fixed;right:10px;top:10px;max-width:260px;z-index:9999;background:#fff;padding:8px;border:1px solid #ccc;font-size:12px";
-    box.innerHTML = "<strong>Unblur-Reihenfolge</strong><ol id='reveal-order-list' style='margin:6px 0;padding-left:20px'></ol>";
+    box.style.cssText =
+      "position:fixed;right:10px;top:10px;max-width:260px;z-index:9999;background:#fff;padding:8px;border:1px solid #ccc;font-size:12px";
+    box.innerHTML =
+      "<strong>Unblur-Reihenfolge</strong><ol id='reveal-order-list' style='margin:6px 0;padding-left:20px'></ol>";
     document.body.appendChild(box);
     list = document.getElementById("reveal-order-list");
   }
@@ -416,21 +450,21 @@ function ensureRevealList() {
 // Erstellt/aktualisiert Heatmap-Box (nur wenn sichtbar)
 function updateHeatmapDisplay() {
   if (!isTrackingVisible()) return;
-  
+
   let box = document.getElementById("heatmap-box");
   if (!box) {
     box = document.createElement("div");
     box.id = "heatmap-box";
-    box.style.cssText = "position:fixed;right:10px;bottom:10px;width:260px;max-height:200px;overflow:auto;background:#fff;border:1px solid #ccc;padding:6px;font-size:11px;z-index:9999";
+    box.style.cssText =
+      "position:fixed;right:10px;bottom:10px;width:260px;max-height:200px;overflow:auto;background:#fff;border:1px solid #ccc;padding:6px;font-size:11px;z-index:9999";
     box.innerHTML = "<strong>Live-Heatmap</strong><div id='heatmap-content'></div>";
     document.body.appendChild(box);
   }
-  document.getElementById("heatmap-content").innerHTML =
-    Object.entries(mouseHeatmapElements)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join("<br>");
+  document.getElementById("heatmap-content").innerHTML = Object.entries(mouseHeatmapElements)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join("<br>");
 }
 
 /*========================================
@@ -453,7 +487,7 @@ function shuffleHotels() {
     console.warn("Container .row.g-4 nicht gefunden — Shuffle übersprungen");
     return;
   }
-  shuffleArray([...container.children]).forEach(c => container.appendChild(c));
+  shuffleArray([...container.children]).forEach((c) => container.appendChild(c));
 }
 
 // Shuffelt Reviews innerhalb jeder Scrollbar
@@ -463,10 +497,10 @@ function shuffleReviews() {
     console.warn("Keine .scrollbar-Elemente gefunden — Review-Shuffle übersprungen");
     return;
   }
-  scrollbars.forEach(sb => {
+  scrollbars.forEach((sb) => {
     const reviews = [...sb.querySelectorAll(":scope > .reviewall")];
     if (reviews.length > 1) {
-      shuffleArray(reviews).forEach(r => sb.appendChild(r));
+      shuffleArray(reviews).forEach((r) => sb.appendChild(r));
     }
   });
 }
@@ -495,7 +529,7 @@ function endTracking() {
     mouseHeatmapElements,
     revealOrder: formatRevealOrder(),
     revealTimes: formatRevealTimes(),
-    revealRanks: formatRevealRanksNumeric(),
+    ...formatRevealRanksNumeric(),
     pageLoadTime: 0.0,
     startButtonDurationMs,
     endButtonDurationMs,
@@ -621,14 +655,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Click-Handler für Reveals (Selector -> Key Mapping)
   // Wird nun hauptsächlich für nicht-geblurrtete Elemente genutzt
-  const selectorToKey = Object.fromEntries(
-    Object.entries(REVEAL_CONFIG).map(([k, v]) => [v.selector, k])
-  );
+  const selectorToKey = Object.fromEntries(Object.entries(REVEAL_CONFIG).map(([k, v]) => [v.selector, k]));
 
-  document.body.addEventListener("click", e => {
+  document.body.addEventListener("click", (e) => {
     // Verhindert doppeltes Auslösen bei Klick auf Label
     if (e.target.closest(".blur-label")) return;
-    
+
     for (const sel of TRACKABLE_SELECTORS) {
       if (e.target.closest(sel)) {
         const key = selectorToKey[sel];
