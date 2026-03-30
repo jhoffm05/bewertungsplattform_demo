@@ -267,20 +267,12 @@ function formatRevealOrder() {
 function formatRevealRanksNumeric() {
   const ranks = {};
 
-  // alle Elemente initial = 0 (nicht geöffnet)
   Object.keys(REVEAL_CONFIG).forEach((key) => {
     ranks[`rank_${key}`] = 0;
   });
 
-  // tatsächliche Rangposition eintragen
-  revealOrder.forEach((label, index) => {
-    // Label → Key zurückübersetzen
-    const entry = Object.entries(REVEAL_CONFIG).find(([k, v]) => v.label === label);
-
-    if (entry) {
-      const key = entry[0];
-      ranks[`rank_${key}`] = index + 1;
-    }
+  revealOrder.forEach((key, index) => {
+    ranks[`rank_${key}`] = index + 1;
   });
 
   return ranks;
@@ -339,11 +331,11 @@ function logReveal(elementName) {
 
   // Sende formatierte Daten an Parent
   postToParent("revealTracking", {
-    revealOrder: formatRevealOrder(),
-    revealTimes: formatRevealTimes(),
-    pageLoadTime: 0.0,
-    ...formatRevealRanksNumeric()
-  });
+  revealOrder: formatRevealOrder(),
+  revealTimes: formatRevealTimes(),
+  revealRanks: formatRevealRanksNumeric(),
+  pageLoadTime: 0.0
+});
 }
 
 /*========================================
@@ -362,7 +354,7 @@ function reveal(key) {
   });
 
   revealedElements[key] = true;
-  logReveal(config.label);
+  logReveal(key);
 }
 
 /*========================================
@@ -526,15 +518,15 @@ function endTracking() {
 
   // ===== FINALE DATEN MIT FORMATIERUNG =====
   const finalPayload = {
-    mouseHeatmapElements,
-    revealOrder: formatRevealOrder(),
-    revealTimes: formatRevealTimes(),
-    ...formatRevealRanksNumeric(),
-    pageLoadTime: 0.0,
-    startButtonDurationMs,
-    endButtonDurationMs,
-    interactionOrder
-  };
+  mouseHeatmapElements,
+  revealOrder: formatRevealOrder(),
+  revealTimes: formatRevealTimes(),
+  revealRanks: formatRevealRanksNumeric(),
+  pageLoadTime: 0.0,
+  startButtonDurationMs,
+  endButtonDurationMs,
+  interactionOrder
+};
 
   console.log("=== FINALE DATEN AN PARENT ===", finalPayload);
   postToParent("heatmapTracking", finalPayload);
