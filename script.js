@@ -9,7 +9,7 @@ const TRACKING_VISIBILITY = "off";
 // ============================================================
 const CONFIG = {
   maxTrackingTimeMs: 7 * 60 * 1000, // Maximale Tracking-Dauer: 7 Minuten
-  mouseSampleInterval: 200,          // Maus-Position wird alle 200 ms geloggt
+  mouseSampleInterval: 200,          // Sampling-Intervall für Maus & Touch (ms)
   parentOrigin: "https://sosci.rlp.net"
 };
 
@@ -57,11 +57,12 @@ const REVEAL_CONFIG = {
 // ZUSTANDSVARIABLEN
 // ============================================================
 
-// pageLoadTime wird in DOMContentLoaded gesetzt (korrekter Messzeitpunkt)
+// Werden in DOMContentLoaded gesetzt (korrekter Messzeitpunkt)
 let pageLoadTime = null;
-let layoutState  = null; // wird ebenfalls in DOMContentLoaded initialisiert
+let layoutState  = null;
 
-// FIX: revealedElements wird aus REVEAL_CONFIG abgeleitet — keine manuelle Synchronisation nötig
+// Enthüllungsstatus je Element — aus REVEAL_CONFIG abgeleitet,
+// damit keine manuelle Synchronisation nötig ist
 const revealedElements = Object.fromEntries(Object.keys(REVEAL_CONFIG).map(k => [k, false]));
 
 // Reveal-Tracking
@@ -69,12 +70,13 @@ let revealOrder = []; // Enthüllungsreihenfolge als Array von Keys
 let revealTimes = {}; // Absoluter Timestamp je enthülltem Element (ms)
 
 // Interaktions-Tracking
-let interactionOrder   = []; // Alle geloggten Interaktionen mit Reihenfolge und Zeit
+let interactionOrder   = [];
 let interactionCounter = 0;
 
-// Maus-Heatmap: { "Hotelname | Selektor" -> Anzahl Maussamples }
+// Heatmap-Daten: { "Hotelname | Selektor" -> Anzahl Samples }
+// Gilt für Maus (Desktop) und Touch (Mobile/Tablet) gleichermaßen
 let mouseHeatmapElements = {};
-let lastMouseSample      = 0; // Timestamp des letzten Samples (Throttle)
+let lastSampleTime       = 0; // Throttle-Timestamp für Maus & Touch
 
 // Start-/End-Button Timing
 let startButtonShownAt    = null;
@@ -197,8 +199,7 @@ function initBlurLabels() {
 // DATENFORMATIERUNG (für SoSciSurvey-Export)
 // ============================================================
 
-// Wandelt revealTimes von Millisekunden in Sekunden relativ
-// zum Seitenlade-Zeitpunkt um (4 Dezimalstellen)
+// Wandelt revealTimes von ms in Sekunden relativ zu pageLoadTime um (4 Dezimalstellen)
 function formatRevealTimes() {
   const formatted = {};
   for (const [key, ts] of Object.entries(revealTimes)) {
@@ -232,15 +233,30 @@ function formatRevealedFlags() {
   );
 }
 
-// Formatiert die Heatmap-Daten als flaches Objekt für SoSci
-// Beispiel: { "heatmap_Hotel Ibis | .star-rating": 12 }
-function formatHeatmapFlat() {
-  return Object.fromEntries(
-    Object.entries(mouseHeatmapElements).map(([k, v]) => [`heatmap_${k}`, v])
-  );
+// Wandelt einen lesbaren Heatmap-Key in einen SoSci-kompatiblen Variablennamen um
+// "Hotel Ibis | .star-rating" -> "hm_Hotel_Ibis__star_rating"
+function buildSosciKey(displayKey) {
+  return "hm_" + displayKey
+    .replace(/\s*\|\s*/g, "__")        // " | " -> "__"
+    .replace(/[^a-zA-Z0-9_]/g, "_")   // Sonderzeichen -> "_"
+    .replace(/_+/g, "_")               // mehrfache Unterstriche zusammenfassen
+    .replace(/^_|_$/g, "");            // führende/abschließende Unterstriche entfernen
 }
 
-// Formatiert interactionOrder für SoSci als nummeriertes Objekt
+// Gibt die Heatmap als zwei parallele Strukturen zurück:
+// raw:   lesbare Keys  { "Hotel Ibis | .star-rating": 12 }
+// sosci: SoSci-Keys    { hm_Hotel_Ibis__star_rating: 12 }
+function formatHeatmapFlat() {
+  const raw   = {};
+  const sosci = {};
+  for (const [displayKey, count] of Object.entries(mouseHeatmapElements)) {
+    raw[displayKey]                  = count;
+    sosci[buildSosciKey(displayKey)] = count;
+  }
+  return { raw, sosci };
+}
+
+// Formatiert interactionOrder als nummeriertes Objekt mit Zeitangabe
 // Beispiel: { 1: "Start-Button @ 0.000s", 2: "stars @ 4.213s" }
 function formatInteractionOrder() {
   return interactionOrder.reduce((acc, entry) => {
@@ -265,28 +281,28 @@ function calcStudyDurationSec() {
 function buildFinalPayload() {
   return {
     // Reveal-Daten
-    revealOrder:        formatRevealOrder(),
-    revealTimes:        formatRevealTimes(),
-    revealRanks:        formatRevealRanksNumeric(),
-    revealedFlags:      formatRevealedFlags(),
-    revealCount:        countRevealed(),
+    revealOrder:         formatRevealOrder(),
+    revealTimes:         formatRevealTimes(),
+    revealRanks:         formatRevealRanksNumeric(),
+    revealedFlags:       formatRevealedFlags(),
+    revealCount:         countRevealed(),
 
-    // Heatmap
-    mouseHeatmap:       formatHeatmapFlat(),
+    // Heatmap (raw = lesbare Keys, sosci = SoSci-kompatible Variablennamen)
+    mouseHeatmap:        formatHeatmapFlat(),
 
-    // Zeitwerte (alle in Sekunden, relativ zu pageLoadTime)
-    pageLoadTime:       0.0,
+    // Zeitwerte (alle in Sekunden, relativ zu pageLoadTime = 0)
+    pageLoadTime:        0.0,
     startButtonDelaySec: startButtonDurationMs !== null
-                          ? parseFloat((startButtonDurationMs / 1000).toFixed(3))
-                          : null,
-    studyDurationSec:   calcStudyDurationSec(),
-    endButtonDelaySec:  endButtonDurationMs !== null
-                          ? parseFloat((endButtonDurationMs / 1000).toFixed(3))
-                          : null,
+                           ? parseFloat((startButtonDurationMs / 1000).toFixed(3))
+                           : null,
+    studyDurationSec:    calcStudyDurationSec(),
+    endButtonDelaySec:   endButtonDurationMs !== null
+                           ? parseFloat((endButtonDurationMs / 1000).toFixed(3))
+                           : null,
 
     // Interaktionsprotokoll
-    interactionOrder:   formatInteractionOrder(),
-    interactionCount:   interactionCounter,
+    interactionOrder:    formatInteractionOrder(),
+    interactionCount:    interactionCounter,
 
     // Kontext
     layoutState,
@@ -305,13 +321,12 @@ function logInteraction(elementName) {
   console.log(`[Tracking] #${interactionCounter} – ${elementName} – ${new Date(timestamp).toLocaleTimeString()}`);
 }
 
-// Loggt die Enthüllung eines Elements inkl. Zeitabstand zur vorherigen Enthüllung
+// Loggt die Enthüllung eines Elements inkl. Zeitabstand zur vorherigen Enthüllung;
+// gibt false zurück, wenn das Zeitlimit bereits überschritten ist
 function logReveal(elementName) {
-  // FIX: isTrackingActive()-Check auch hier, damit revealOrder und
-  // revealedElements nach Zeitablauf konsistent bleiben
   if (!isTrackingActive()) {
     console.warn(`[Tracking] Zeitlimit erreicht — "${elementName}" wird nicht geloggt`);
-    return false; // Rückgabewert signalisiert, ob Log erfolgreich war
+    return false;
   }
 
   const now      = Date.now();
@@ -331,17 +346,16 @@ function logReveal(elementName) {
     }
   }
 
-  // Nach jeder Enthüllung aktuellen Stand an Parent übermitteln (Delta-Ansatz:
-  // nur neue Enthüllung + kumulierter Stand, keine vollständige Payload)
+  // Nach jeder Enthüllung aktuellen Stand an Parent übermitteln
   postToParent("revealTracking", {
-    latest:      elementName,
+    latest:        elementName,
     latestTimeSec: parseFloat(((now - pageLoadTime) / 1000).toFixed(4)),
-    revealOrder: formatRevealOrder(),
-    revealTimes: formatRevealTimes(),
-    revealRanks: formatRevealRanksNumeric(),
+    revealOrder:   formatRevealOrder(),
+    revealTimes:   formatRevealTimes(),
+    revealRanks:   formatRevealRanksNumeric(),
     revealedFlags: formatRevealedFlags(),
-    revealCount: countRevealed(),
-    pageLoadTime: 0.0
+    revealCount:   countRevealed(),
+    pageLoadTime:  0.0
   });
 
   console.log(`[Tracking] #${revealOrder.length} "${elementName}" @ ${((now - pageLoadTime) / 1000).toFixed(4)}s (+${duration}s)`);
@@ -353,14 +367,13 @@ function logReveal(elementName) {
 // ============================================================
 
 // Enthüllt alle DOM-Elemente des gegebenen Keys:
-// Entfernt Blur-Klasse und Label, setzt revealedElements-Flag
+// Entfernt Blur-Klasse und Label, setzt revealedElements-Flag.
+// Wird nur ausgeführt, wenn logReveal erfolgreich war (Zeitlimit-Schutz).
 function reveal(key) {
   if (!key || revealedElements[key]) return;
   const config = REVEAL_CONFIG[key];
   if (!config) return;
 
-  // FIX: revealedElements wird nur gesetzt, wenn logReveal erfolgreich war —
-  // verhindert inkonsistenten Zustand nach Zeitlimitablauf
   const logged = logReveal(key);
   if (!logged) return;
 
@@ -373,10 +386,10 @@ function reveal(key) {
 }
 
 // ============================================================
-// MAUS-HEATMAP
+// HEATMAP-TRACKING (Maus & Touch)
 // ============================================================
 
-// Erstellt den Heatmap-Key aus Hotelname und CSS-Selektor
+// Erstellt den lesbaren Heatmap-Key: "Hotelname | Selektor"
 function buildElementKey(el, selector) {
   const hotel = el.closest(".hotel-card");
   const name  = hotel?.querySelector(".card-title")?.innerText.trim() || "unknown";
@@ -393,7 +406,7 @@ function ensureHeatmapOverlay(el) {
   el.appendChild(overlay);
 }
 
-// Färbt alle Heatmap-Overlays proportional zur maximalen Hover-Anzahl ein
+// Färbt alle Heatmap-Overlays proportional zur maximalen Sample-Anzahl ein
 function updateVisualHeatmap() {
   if (!isTrackingVisible()) return;
   const values = Object.values(mouseHeatmapElements);
@@ -410,15 +423,17 @@ function updateVisualHeatmap() {
   });
 }
 
-// Erfasst die aktuelle Mausposition und zählt Samples je Element hoch;
-// wird via mousemove ausgelöst und auf CONFIG.mouseSampleInterval gedrosselt
-function trackMouse(event) {
-  if (!isTrackingActive() || layoutState === "mobile") return;
-  if (Date.now() - lastMouseSample < CONFIG.mouseSampleInterval) return;
-  lastMouseSample = Date.now();
+// Gemeinsame Sample-Logik für Maus und Touch:
+// Sucht das getroffene trackbare Element und zählt dessen Sample-Counter hoch.
+// Auf CONFIG.mouseSampleInterval gedrosselt.
+function recordSample(target) {
+  if (!isTrackingActive()) return;
+  const now = Date.now();
+  if (now - lastSampleTime < CONFIG.mouseSampleInterval) return;
+  lastSampleTime = now;
 
   for (const sel of TRACKABLE_SELECTORS) {
-    const el = event.target.closest(sel);
+    const el = target.closest(sel);
     if (el) {
       const key = buildElementKey(el, sel);
       mouseHeatmapElements[key] = (mouseHeatmapElements[key] || 0) + 1;
@@ -429,6 +444,21 @@ function trackMouse(event) {
       break; // Pro Sample nur ein Element zählen
     }
   }
+}
+
+// Desktop: Mausbewegung -> recordSample mit event.target
+function trackMouse(event) {
+  recordSample(event.target);
+}
+
+// Mobile/Tablet: Touch-Bewegung -> recordSample via elementFromPoint,
+// da touch.target beim Touchstart eingefroren ist und sich beim
+// Wischen nicht aktualisiert
+function trackTouch(event) {
+  const touch = event.touches[0];
+  if (!touch) return;
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el) recordSample(el);
 }
 
 // ============================================================
@@ -468,7 +498,7 @@ function updateHeatmapDisplay() {
     box.innerHTML = "<strong>Live-Heatmap</strong><div id='heatmap-content'></div>";
     document.body.appendChild(box);
   }
-  // Top-8-Elemente nach Hover-Häufigkeit anzeigen
+  // Top-8-Elemente nach Sample-Häufigkeit anzeigen
   document.getElementById("heatmap-content").innerHTML = Object.entries(mouseHeatmapElements)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
@@ -525,8 +555,10 @@ function endTracking() {
   endButtonClickedAt  = Date.now();
   endButtonDurationMs = endButtonClickedAt - (startButtonClickedAt || pageLoadTime);
 
-  // Mousemove-Listener sofort entfernen, damit keine weiteren Samples einfließen
-  document.removeEventListener("mousemove", trackMouse);
+  // Alle Tracking-Listener sofort entfernen, damit keine Samples mehr einfließen
+  document.removeEventListener("mousemove",  trackMouse);
+  document.removeEventListener("touchstart", trackTouch);
+  document.removeEventListener("touchmove",  trackTouch);
 
   logInteraction("Fenster schließen");
 
@@ -535,7 +567,7 @@ function endTracking() {
   console.log("=== FINALE DATEN AN PARENT ===", finalPayload);
   postToParent("heatmapTracking", finalPayload);
 
-  // Close-Button ausblenden (Referenz aus dem DOM holen, da außerhalb der Closure)
+  // Close-Button ausblenden
   document.getElementById("closeTrackingButton")?.style.setProperty("display", "none");
 
   // Weißen Abschlussscreen einblenden
@@ -616,12 +648,12 @@ document.head.appendChild(style);
 // ============================================================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // FIX: pageLoadTime erst hier setzen — nach tatsächlichem DOM-Ready
+  // pageLoadTime erst hier setzen — nach tatsächlichem DOM-Ready
   pageLoadTime       = Date.now();
   startButtonShownAt = pageLoadTime;
   layoutState        = getLayoutState();
 
-  // FIX: Layout bei Größenänderung aktualisieren (z.B. Tablet-Rotation);
+  // Layout bei Größenänderung aktualisieren (z.B. Tablet-Rotation);
   // Mousemove-Listener wird bei Wechsel auf Mobile entfernt
   window.addEventListener("resize", () => {
     const newState = getLayoutState();
@@ -670,7 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Start-Button: blendet Overlay aus, startet Maus-Tracking und zeigt Close-Button
+  // Start-Button: blendet Overlay aus, startet Tracking und zeigt Close-Button
   const startBtn     = document.getElementById("startButton");
   const startOverlay = document.getElementById("startOverlay");
 
@@ -686,10 +718,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (startOverlay) startOverlay.style.display = "none";
 
-    // Maus-Tracking nur auf Desktop aktivieren
+    // Desktop: Mausbewegung tracken
     if (layoutState !== "mobile") {
       document.addEventListener("mousemove", trackMouse, { passive: true });
     }
+
+    // Mobile & Tablet: Touch-Bewegung tracken.
+    // touchstart erfasst kurze Taps, touchmove erfasst Wischgesten über Elementen.
+    document.addEventListener("touchstart", trackTouch, { passive: true });
+    document.addEventListener("touchmove",  trackTouch, { passive: true });
 
     closeBtn.style.display = "block";
   });
