@@ -294,7 +294,6 @@ function buildFinalPayload() {
     // Zeitwerte
     pageLoadTime:        0.0,
     
-    // MS für Parent + Sek für interne Nutzung
     startButtonDurationMs: startButtonDurationMs || 0,
     endButtonDurationMs: endButtonDurationMs || 0,
     startButtonDelaySec: startButtonDurationMs !== null
@@ -308,6 +307,9 @@ function buildFinalPayload() {
     // Interaktionsprotokoll
     interactionOrder:    formatInteractionOrder(),
     interactionCount:    interactionCounter,
+
+    // NEU
+    endButtonClickedFlag: endButtonClicked ? 1 : 0,
 
     // Kontext
     layoutState,
