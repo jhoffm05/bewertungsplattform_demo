@@ -287,17 +287,18 @@ function buildFinalPayload() {
     revealedFlags:       formatRevealedFlags(),
     revealCount:         countRevealed(),
 
-    // Heatmap (raw = lesbare Keys, sosci = SoSci-kompatible Variablennamen)
-    mouseHeatmap:        formatHeatmapFlat(),
+    // === HEATMAP - WICHTIG ===
+    mouseHeatmapElements: mouseHeatmapElements,     
+    mouseHeatmapFormatted: formatHeatmapFlat(),     
 
-    // Zeitwerte (alle in Sekunden, relativ zu pageLoadTime = 0)
+    // Zeitwerte
     pageLoadTime:        0.0,
-    startButtonDelaySec: startButtonDurationMs !== null
-                           ? parseFloat((startButtonDurationMs / 1000).toFixed(3))
+    startButtonDelaySec: startButtonDurationMs !== null 
+                           ? parseFloat((startButtonDurationMs / 1000).toFixed(3)) 
                            : null,
     studyDurationSec:    calcStudyDurationSec(),
-    endButtonDelaySec:   endButtonDurationMs !== null
-                           ? parseFloat((endButtonDurationMs / 1000).toFixed(3))
+    endButtonDelaySec:   endButtonDurationMs !== null 
+                           ? parseFloat((endButtonDurationMs / 1000).toFixed(3)) 
                            : null,
 
     // Interaktionsprotokoll
