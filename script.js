@@ -105,7 +105,7 @@ function isTrackingActive() {
 function getLayoutState() {
   const w = window.innerWidth;
   if (w < 768)  return "mobile";
-  if (w < 900) return "2-hotels";
+  if (w < 1200) return "2-hotels";
   return "3-hotels";
 }
 
