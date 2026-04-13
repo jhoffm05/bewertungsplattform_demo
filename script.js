@@ -669,7 +669,10 @@ document.head.appendChild(style);
 // ============================================================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // pageLoadTime erst hier setzen — nach tatsächlichem DOM-Ready
+  console.log("=== DEBUG LAYOUT ===");
+  console.log("window.innerWidth:", window.innerWidth);
+  console.log("Erwartetes Layout:", getLayoutState());
+  
   pageLoadTime       = Date.now();
   startButtonShownAt = pageLoadTime;
   layoutState        = getLayoutState();
