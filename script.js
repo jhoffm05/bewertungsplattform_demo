@@ -554,11 +554,19 @@ function shuffleReviews() {
 // Beendet die Studie: berechnet finale Zeiten, sendet alle Daten
 // an den Parent-Frame und blendet einen weißen Abschlussscreen ein
 function endTracking() {
-  if (endButtonClicked) return; // Doppelklick verhindern
+  if (endButtonClicked) return;
   endButtonClicked = true;
 
   endButtonClickedAt  = Date.now();
   endButtonDurationMs = endButtonClickedAt - (startButtonClickedAt || pageLoadTime);
+
+  // === DEBUGGING ===
+  console.log("=== DEBUG: Timing-Variablen vor endTracking() ===");
+  console.log("startButtonDurationMs:", startButtonDurationMs);
+  console.log("endButtonDurationMs:", endButtonDurationMs);
+  console.log("startButtonClickedAt:", startButtonClickedAt);
+  console.log("endButtonClickedAt:", endButtonClickedAt);
+  // === ENDE DEBUG ===
 
   // Alle Tracking-Listener sofort entfernen, damit keine Samples mehr einfließen
   document.removeEventListener("mousemove",  trackMouse);
@@ -569,6 +577,14 @@ function endTracking() {
 
   // Finale Payload bauen und senden
   const finalPayload = buildFinalPayload();
+  
+  // === DEBUGGING ===
+  console.log("=== FINAL PAYLOAD (vollständig) ===");
+  console.log("startButtonDurationMs:", finalPayload.startButtonDurationMs);
+  console.log("endButtonDurationMs:", finalPayload.endButtonDurationMs);
+  console.log("Vollständiger Payload:", finalPayload);
+  // === ENDE DEBUG ===
+  
   console.log("=== FINALE DATEN AN PARENT ===", finalPayload);
   postToParent("heatmapTracking", finalPayload);
 
