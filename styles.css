@@ -366,6 +366,53 @@ nav {
       margin-bottom: 3%;
 }
 
+.hotel-image-container {
+  position: relative;
+}
+
+.hotel-image-container .card-img-top {
+  display: block;
+  width: 100%;
+}
+
+/* Logo am Übergang zwischen Bild und weißer Fläche */
+.hotel-logo {
+  position: absolute;
+  right: 6%;
+  bottom: 0;
+  transform: translateY(50%);
+  z-index: 5;
+
+  width: clamp(80px, 22%, 115px);
+  height: auto;
+
+  background-color: white;
+  border: 0 solid white;
+  border-radius: 50%;
+  padding: 4px;
+
+  object-fit: contain;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Verhindert eine Überschneidung von Titel und Logo */
+.hotel-card .card-title {
+  padding-right: 120px;
+}
+
+@media (max-width: 400px) {
+  .hotel-logo {
+    width: 75px;
+    right: 4%;
+  }
+
+  .hotel-card .card-title {
+    padding-right: 85px;
+  }
+}
+
+
+
 .only-mobile {
       display: none;
 }
