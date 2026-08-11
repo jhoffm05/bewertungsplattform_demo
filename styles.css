@@ -1,5 +1,5 @@
 body {
-      background-color: #ffffff;
+      background-color: #ffffff; 
 }
 
 h1 {
@@ -39,6 +39,11 @@ nav {
 .navbar img {
       height: 100px;
       padding-left: 20px;
+}
+
+.row {
+      margin-left: -10%;
+      margin-right: -10%;
 }
 
 .star {
@@ -439,6 +444,8 @@ nav {
       .row {
             padding-top: 0;
             margin-top: -120px;
+            margin-left: -10%;
+            margin-right: -10%;
       }
 
       .only-mobile {
